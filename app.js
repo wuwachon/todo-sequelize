@@ -4,6 +4,7 @@ const methodOverride = require('method-override')
 const session = require('express-session')
 const routes = require('./routes/index')
 const usePassport = require('./config/passport')
+if (process.env.Node_Env !== 'production') require('dotenv').config()
 
 const app = express()
 const exphbs = new create({defaultLayout: 'main', extname: '.hbs'})
