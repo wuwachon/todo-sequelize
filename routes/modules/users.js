@@ -21,10 +21,26 @@ router.get('/register', (req, res) => {
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, confirmPassword } = req.body
+    const errors = []
+    if (!name || !email || !password || !confirmPassword) errors.push({message: 'All fields are required!'})
+    if (password !== confirmPassword) errors.push({message: 'Password does not match the ConfirmPassword you entered.'})
+    if (errors.length) return res.render('register', {
+      errors,
+      name,
+      email,
+      password,
+      confirmPassword
+    })
     const user = await User.findOne({ where: {email} })
     if (user) {
-      console.log('User already exist')
-      return res.render('register', {name, email, password, confirmPassword})
+      errors.push({message: 'User already exist'})
+      return res.render('register', {
+        errors,
+        name,
+        email,
+        password,
+        confirmPassword
+      })
     }
     const salt = bcrypt.genSaltSync(10)
     const hash = bcrypt.hashSync(password, salt)
@@ -38,6 +54,7 @@ router.post('/register', async (req, res) => {
 router.get('/logout', (req, res) => {
   req.logout(err => {
     if(err) return next(err)
+    req.flash('success_msg', 'Logout successfully!')
     res.redirect('/users/login')
   })
 })

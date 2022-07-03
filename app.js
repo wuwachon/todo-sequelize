@@ -2,6 +2,7 @@ const express = require('express')
 const { create } = require('express-handlebars')
 const methodOverride = require('method-override')
 const session = require('express-session')
+const flash = require('connect-flash')
 const routes = require('./routes/index')
 const usePassport = require('./config/passport')
 if (process.env.Node_Env !== 'production') require('dotenv').config()
@@ -20,6 +21,16 @@ app.use(session({
   saveUninitialized: true
 }))
 usePassport(app)
+
+app.use(flash())
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.isAuthenticated
+  res.locals.user = req.user
+  res.locals.success_msg = req.flash('success_msg')
+  res.locals.warning_msg = req.flash('warning_msg')
+  res.locals.faillogin_msg = req.flash('faillogin_msg')
+  next()
+})
 
 app.use(routes)
 
